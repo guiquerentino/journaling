@@ -15,7 +15,7 @@ public class UserService {
     @Autowired
     private UserRepository repository;
 
-    public UserLoginResponse CriaContaNoBanco(User user) {
+    public UserLoginResponse criaContaNoBanco(User user) {
 
         UserLoginResponse response = new UserLoginResponse();
 
@@ -23,6 +23,7 @@ public class UserService {
             repository.save(user);
             response.setResponse("Usuário criado com sucesso!");
             response.setStatus(ResultadoLogin.CONTA_CRIADA);
+            response.setIdUsuario(user.getID());
             return response;
         }
 
@@ -41,6 +42,7 @@ public class UserService {
         if (validaInformacoesLogin(user)) {
             response.setResponse("Login com sucesso!");
             response.setStatus(ResultadoLogin.SUCESSO_LOGIN);
+            response.setIdUsuario(user.getID());
             return response;
         }
 

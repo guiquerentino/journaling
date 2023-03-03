@@ -13,4 +13,7 @@ public class UserLoginResponse {
     @JsonProperty(value = "status")
     private ResultadoLogin status;
 
+    @JsonProperty(value = "ID")
+    private Long idUsuario;
+
 }

@@ -32,7 +32,7 @@ public class LoginController {
             user.setLogin(request.getLogin());
             user.setSenha(request.getSenha());
 
-            UserLoginResponse response = service.CriaContaNoBanco(user);
+            UserLoginResponse response = service.criaContaNoBanco(user);
 
             if (response.getStatus() == ResultadoLogin.CONTA_CRIADA) {
                 return new ResponseEntity<>(response, HttpStatus.CREATED);
