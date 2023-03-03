@@ -6,6 +6,7 @@ import com.br.ifsp.journaling.entities.enums.*;
 import com.br.ifsp.journaling.service.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
+import org.springframework.validation.annotation.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.*;
@@ -36,7 +37,7 @@ public class LoginController {
     }
 
     @GetMapping(value = "/user")
-    public ResponseEntity<Object> recebeRequisicaoLogin(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<Object> recebeRequisicaoLogin(@RequestBody @Valid UserLoginRequest request) {
 
         User user = new User();
 
@@ -54,7 +55,7 @@ public class LoginController {
     }
 
     @PutMapping(value = "/user/password")
-    public ResponseEntity<Object> redefineSenhaUsuario(@RequestBody UserLoginRequest request){
+    public ResponseEntity<Object> redefineSenhaUsuario(@RequestBody @Valid UserLoginRequest request){
 
         User user = new User();
 

@@ -1,18 +1,17 @@
 package com.br.ifsp.journaling.entities.dto;
 
 import lombok.*;
+import org.springframework.stereotype.*;
 
 import javax.validation.constraints.*;
 
 @Data
 public class UserLoginRequest {
 
-    @NotNull
-    @NotBlank
+    @NotEmpty
     private String login;
 
-    @NotNull
-    @NotBlank
+    @NotEmpty
     private String senha;
 
 }
