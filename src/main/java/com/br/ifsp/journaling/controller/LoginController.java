@@ -12,64 +12,83 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.*;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1/user")
 public class LoginController {
 
     @Autowired
     private UserService service;
 
-    @PostMapping(value = "/user")
-    public ResponseEntity<Object> criaUsuario(@RequestBody @Valid UserLoginRequest request) {
+    @Autowired
+    private TokenService tokenService;
 
-        User user = new User();
+    @PostMapping
+    public ResponseEntity<Object> criaUsuario(@RequestBody @Valid UserLoginRequest request, @RequestHeader String token) {
 
-        user.setLogin(request.getLogin());
-        user.setSenha(request.getSenha());
+        if (tokenService.validaToken(token)) {
 
-        UserLoginResponse response = service.CriaContaNoBanco(user);
 
-        if (response.getStatus() == ResultadoLogin.SUCESSO_LOGIN) {
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            User user = new User();
+
+            user.setLogin(request.getLogin());
+            user.setSenha(request.getSenha());
+
+            UserLoginResponse response = service.CriaContaNoBanco(user);
+
+            if (response.getStatus() == ResultadoLogin.CONTA_CRIADA) {
+                return new ResponseEntity<>(response, HttpStatus.CREATED);
+            }
+
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> recebeRequisicaoLogin(@RequestBody @Valid UserLoginRequest request, @RequestParam String token) {
+
+        if (tokenService.validaToken(token)) {
+
+            User user = new User();
+
+            user.setSenha(request.getSenha());
+            user.setLogin(request.getLogin());
+
+            UserLoginResponse response = service.validaLogin(user);
+
+            if (response.getStatus() == ResultadoLogin.ERRO_LOGIN) {
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
         }
 
-        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
     }
 
-    @GetMapping(value = "/user")
-    public ResponseEntity<Object> recebeRequisicaoLogin(@RequestBody @Valid UserLoginRequest request) {
+    @PutMapping(value = "/password")
+    public ResponseEntity<Object> redefineSenhaUsuario(@RequestBody @Valid UserLoginRequest request, @RequestParam String token) {
 
-        User user = new User();
 
-        user.setSenha(request.getSenha());
-        user.setLogin(request.getLogin());
+        if (tokenService.validaToken(token)) {
 
-        UserLoginResponse response = service.validaLogin(user);
+            User user = new User();
 
-        if (response.getStatus() == ResultadoLogin.ERRO_LOGIN) {
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            user.setSenha(request.getSenha());
+            user.setLogin(request.getLogin());
+
+            UserLoginResponse response = service.redefineSenha(user);
+
+            if (response.getStatus() == ResultadoLogin.USUARIO_INEXISTENTE) {
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
         }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
-    }
-
-    @PutMapping(value = "/user/password")
-    public ResponseEntity<Object> redefineSenhaUsuario(@RequestBody @Valid UserLoginRequest request){
-
-        User user = new User();
-
-        user.setSenha(request.getSenha());
-        user.setLogin(request.getLogin());
-
-        UserLoginResponse response = service.redefineSenha(user);
-
-        if (response.getStatus() == ResultadoLogin.USUARIO_INEXISTENTE) {
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-        }
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
 }
