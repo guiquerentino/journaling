@@ -33,7 +33,7 @@ public class UserService {
 
     }
 
-    public UserLoginResponse validaLogin(User user){
+    public UserLoginResponse validaLogin(User user) {
 
         UserLoginResponse response = new UserLoginResponse();
 
@@ -51,6 +51,40 @@ public class UserService {
 
     }
 
+    public UserLoginResponse redefineSenha(User user) {
+        Optional<User> DbUser = repository.findByLogin(user.getLogin());
+
+        UserLoginResponse response = new UserLoginResponse();
+
+        if (!DbUser.isEmpty()) {
+
+            if(DbUser.get().getSenha().equals(user.getSenha())){
+
+                response.setStatus(ResultadoLogin.SENHA_IGUAL);
+                response.setResponse("Senha igual a anterior");
+
+                return response;
+
+            }
+
+            DbUser.get().setSenha(user.getSenha());
+            DbUser.get().setLogin(user.getLogin());
+
+            repository.save(DbUser.get());
+
+            response.setStatus(ResultadoLogin.SENHA_ATUALIZADA);
+            response.setResponse("Sucesso ao atualizar senha!");
+
+            return response;
+        }
+
+        response.setStatus(ResultadoLogin.USUARIO_INEXISTENTE);
+        response.setResponse("Erro ao atualizar senha!");
+
+        return response;
+
+    }
+
     private boolean contaExisteNoBanco(User user) {
         Optional<User> DbUser = repository.findByLogin(user.getLogin());
 
@@ -61,7 +95,7 @@ public class UserService {
         return true;
     }
 
-    private boolean validaInformacoesLogin(User user){
+    private boolean validaInformacoesLogin(User user) {
         Optional<User> DbUser = repository.findByLoginAndSenha(user.getLogin(), user.getSenha());
 
         if (DbUser.isEmpty()) {

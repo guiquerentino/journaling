@@ -53,4 +53,22 @@ public class LoginController {
 
     }
 
+    @PutMapping(value = "/user/password")
+    public ResponseEntity<Object> redefineSenhaUsuario(@RequestBody UserLoginRequest request){
+
+        User user = new User();
+
+        user.setSenha(request.getSenha());
+        user.setLogin(request.getLogin());
+
+        UserLoginResponse response = service.redefineSenha(user);
+
+        if (response.getStatus() == ResultadoLogin.USUARIO_INEXISTENTE) {
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+
 }
